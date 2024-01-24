@@ -1,4 +1,4 @@
-$downloadUrl = "https://example.com/AppVolumesAgent.msi"
+$downloadUrl = "https://raw.githubusercontent.com/mwandell-hilbgroup/HilbgroupAutomation/main/AppVoumeAgentInstall/App Volumes Agent.msi"
 $downloadPath = "C:\Temp\AppVolumesAgent.msi"
 
 try {
