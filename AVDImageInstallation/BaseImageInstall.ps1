@@ -161,13 +161,14 @@ function Install-AdobeAcrobat {
         [string]$AdobeTransformURL = "https://eusthginfrastructure.blob.core.windows.net/thg-avd-deployment-scripts/AVD_Image_Deployments/AcroPro.mst"
     )
     $TempFilePath = Get-TempFilePath -FileName "AdobeAcrobatWebURL.zip"
+    $TempDirectory = (Split-Path -Path $TempFilePath -Parent)
     $AcrobatPath = "$TempDirectory\Adobe Acrobat"
 
     # Download the file
     Invoke-WebRequest -Uri $AdobeAcrobatWebURL -OutFile $TempFilePath
 
     # Extract the file
-    Expand-Archive -Path $TempFilePath -DestinationPath "$TempDirectory"
+    Expand-Archive -Path $TempFilePath -DestinationPath $TempDirectory -Force
 
     # Download transformFile
     Invoke-WebRequest -Uri $AdobeTransformURL -OutFile "$AcrobatPath\Transforms\AcroPro.mst"
@@ -288,6 +289,10 @@ cd "C:\Program Files (x86)\ImageRight\InstallerService\"
 curl -o IRInstallerService.exe.config "https://eusthginfrastructure.blob.core.windows.net/thg-remediation-scripts/thgx-IRInstallerService.exe.config"
 '@
 
+if (-not (Test-Path -Path "C:\Hilb")){
+New-Item -ItemType Directory -Path "C:\Hilb"
+}
+    Invoke-WebRequest -Uri "https://eusthginfrastructure.blob.core.windows.net/thg-remediation-scripts/WorkSmart%20Installer.exe" -OutFile "C:\Hilb\WorkSmartInstaller.exe"
     Set-Content "C:\hilb\ir.bat" $Body
 
     Write-Host "Waiting for Installation to complete. Pausing for 5 minutes."
