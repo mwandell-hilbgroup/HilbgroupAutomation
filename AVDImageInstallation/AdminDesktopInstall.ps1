@@ -1,6 +1,8 @@
 # Enable RSAT ADDS and DNS
-Enable-WindowsOptionalFeature -Online -FeatureName RSAT-ADDS -All
-Enable-WindowsOptionalFeature -Online -FeatureName RSAT-DNS-Server -All
+Add-WindowsCapability -Online -Name "Rsat.ActiveDirectory.DS-LDS.Tools~~~~0.0.1.0"
+Add-WindowsCapability -Online -Name "Rsat.Dns.Tools~~~~0.0.1.0"
 
 choco install filezilla -y -Force
 choco install rdm -y -Force
+choco install mremoteng -y -Force
+choco install vscode -y -Force
