@@ -353,14 +353,49 @@ function Install-MSIXCert {
     Import-PfxCertificate -Password $password -FilePath $TempFilePath -CertStoreLocation Cert:\LocalMachine\Root
 }
 
+function Repair-Winget {
+    ##*===============================================
+    ##* Find Latest Version of Winget
+    ##*===============================================
+    function getNewestLink($match) {
+        $uri = 'https://api.github.com/repos/microsoft/winget-cli/releases/latest'
+        Write-Verbose "[$((Get-Date).TimeofDay)] Getting information from $uri"
+        $get = Invoke-RestMethod -Uri $uri -Method Get -UseBasicParsing -ErrorAction stop
+        Write-Verbose "[$((Get-Date).TimeofDay)] getting latest release"
+        $data = $get[0].assets | Where-Object name -Match $match
+        return $data.browser_download_url
+    }
+    
+    $wingetUrl = getNewestLink('msixbundle')
+    $wingetLicenseUrl = getNewestLink('License1.xml')
+    
+    ##*===============================================
+    ##* Install Winget
+    ##*===============================================
+    Write-Host 'Installing Winget'
+    $wingetPath = 'winget.msixbundle'
+    $wc = New-Object net.webclient
+    $wc.Downloadfile($wingetUrl, $wingetPath)
 
+    $wingetLicensePath = 'license1.xml'
+    $wc = New-Object net.webclient
+    $wc.Downloadfile($wingetLicenseUrl, $wingetLicensePath)
 
+    Add-AppxProvisionedPackage -Online -PackagePath $wingetPath -LicensePath $wingetLicensePath -ErrorAction SilentlyContinue
+    $path = [Environment]::GetEnvironmentVariable('PATH', 'User')
+    $path = $path + ';' + [IO.Path]::Combine([Environment]::GetEnvironmentVariable('LOCALAPPDATA'), 'Microsoft', 'WindowsApps')
+    [Environment]::SetEnvironmentVariable('PATH', $path, 'User')
+    Remove-Item $wingetPath
+    Remove-Item $wingetLicensePath
+
+    winget install Microsoft.WindowsAppRuntime.1.4
+}
 
 Enable-WindowsOptionalFeature -Online -FeatureName "NetFx3"
 
 Install-Chocolatey
 
-Install-ChocoPackages -Packages @('googlechrome', 'notepadplusplus', '7zip')
+Install-ChocoPackages -Packages @('googlechrome', 'notepadplusplus', '7zip', 'vlc')
 
 Install-AdobeAcrobat
 
@@ -369,3 +404,7 @@ Install-AMS360
 Install-ImageRight
 
 Install-MSIXCert
+
+Repair-Winget
+
+Set-Service wuauserv -StartupType Disabled -Force
