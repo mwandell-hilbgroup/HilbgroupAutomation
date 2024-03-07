@@ -177,6 +177,13 @@ function Install-AdobeAcrobat {
     Start-Process -FilePath "$AcrobatPath\setup.exe" -ArgumentList "/sAll /rs /msi  EULA_ACCEPT=YES LANG_LIST=en_US UPDATE_MODE=0 DISABLE_ARM_SERVICE_INSTALL=1 ADD_THUMBNAILPREVIEW=YES" -Wait
 }
 
+function Install-LastPass {
+    param (
+        [string]$LastPassURL = "https://download.cloud.lastpass.com/windows_installer/LastPassInstaller.msi"
+    )
+    Invoke-DownloadAndStartProcess -DownloadURL $LastPassURL -FileName "LastPassInstaller.msi" -Arguments "ALLUSERS=1 ADDLOCAL=ExplorerExtension,ChromeExtension,FirefoxExtension,EdgeExtension NODISABLEIEPWMGR=1 NODISABLECHROMEPWMGR=1 /qn"
+}
+
 <#
 .SYNOPSIS
 Installs AMS360.
@@ -402,6 +409,8 @@ Install-AdobeAcrobat
 Install-AMS360
 
 Install-ImageRight
+
+Install-LastPass
 
 Install-MSIXCert
 
