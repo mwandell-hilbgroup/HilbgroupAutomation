@@ -72,7 +72,7 @@ $configXML | Out-File $ConfigPath
 #Run the O365 install
 try {
     Write-Verbose 'Downloading and installing Microsoft 365'
-    $Silent = Start-Process "$OfficeInstallDownloadPath\Setup.exe" -ArgumentList "/configure $ConfigPath" -Wait -PassThru
+    Start-Process "$OfficeInstallDownloadPath\Setup.exe" -ArgumentList "/configure $ConfigPath" -Wait -PassThru | Out-Null
   }
   catch {
     Write-Warning 'Error running the Office install. The error is below:'
