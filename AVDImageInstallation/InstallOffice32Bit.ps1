@@ -9,7 +9,11 @@ $configXML = @"
     <Language ID="en-us" />
     <ExcludeApp ID="Groove" />
     <ExcludeApp ID="Lync" />
+    <ExcludeApp ID="Access" />
   </Product>
+  <Product ID="AccessRuntimeRetail">
+      <Language ID="en-us" />
+    </Product>
 </Add>
 <Property Name="SharedComputerLicensing" Value="1" />
 <Property Name="FORCEAPPSHUTDOWN" Value="FALSE" />

@@ -177,11 +177,47 @@ function Install-AdobeAcrobat {
     Start-Process -FilePath "$AcrobatPath\setup.exe" -ArgumentList "/sAll /rs /msi  EULA_ACCEPT=YES LANG_LIST=en_US UPDATE_MODE=0 DISABLE_ARM_SERVICE_INSTALL=1 ADD_THUMBNAILPREVIEW=YES" -Wait
 }
 
+<#
+.SYNOPSIS
+Installs LastPass using the specified LastPass installer URL.
+
+.DESCRIPTION
+The Install-LastPass function downloads and installs LastPass on the local machine using the LastPass installer URL provided as a parameter. By default, it uses the LastPassURL "https://download.cloud.lastpass.com/windows_installer/LastPassInstaller.msi".
+
+.PARAMETER LastPassURL
+Specifies the URL of the LastPass installer. If not provided, the default URL will be used.
+
+.EXAMPLE
+Install-LastPass -LastPassURL "https://example.com/lastpassinstaller.msi"
+Downloads and installs LastPass using the specified LastPass installer URL.
+#>
 function Install-LastPass {
     param (
         [string]$LastPassURL = "https://download.cloud.lastpass.com/windows_installer/LastPassInstaller.msi"
     )
     Invoke-DownloadAndStartProcess -DownloadURL $LastPassURL -FileName "LastPassInstaller.msi" -Arguments "ALLUSERS=1 ADDLOCAL=ExplorerExtension,ChromeExtension,FirefoxExtension,EdgeExtension NODISABLEIEPWMGR=1 NODISABLECHROMEPWMGR=1 /qn"
+}
+
+<#
+.SYNOPSIS
+Installs TransactNOW application.
+
+.DESCRIPTION
+This function installs the TransactNOW application by downloading the setup file from the specified URL and starting the installation process.
+
+.PARAMETER TransactNowURL
+The URL of the TransactNOW setup file. The default value is "https://eusthginfrastructure.blob.core.windows.net/thg-avd-deployment-scripts/AVD_Image_Deployments/TransactNOW Setup.exe".
+
+.EXAMPLE
+Install-TransactNow -TransactNowURL "https://example.com/TransactNOW_Setup.exe"
+Downloads the TransactNOW setup file from the specified URL and starts the installation process.
+
+#>
+function Install-TransactNow {
+    param (
+        [string]$TransactNowURL = "https://eusthginfrastructure.blob.core.windows.net/thg-avd-deployment-scripts/AVD_Image_Deployments/TransactNOW Setup.exe"
+    )
+    Invoke-DownloadAndStartProcess -DownloadURL $TransactNowURL -FileName "TransactNowSetup.exe" -Arguments "-q"    
 }
 
 <#
@@ -420,6 +456,8 @@ Install-ImageRight
 Install-LastPass
 
 Install-MSIXCert
+
+Install-TransactNow
 
 Repair-Winget
 
