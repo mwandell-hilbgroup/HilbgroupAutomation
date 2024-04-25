@@ -245,6 +245,13 @@ function Install-AMS360 {
         [string]$AMS360WebURL = 'https://eusthginfrastructure.blob.core.windows.net/thg-remediation-scripts/AMS360ClientInstallerRev11.msi'
     )
     Invoke-DownloadAndStartProcess -DownloadURL $AMS360WebURL -FileName 'AMS360ClientInstallerRev11.msi' -Arguments '/qn'
+
+    if (Test-Path -Path 'C:\users\Public\Desktop\Install TransactNow.url') {
+        Remove-Item -Path 'C:\users\Public\Desktop\Install TransactNow.url' -Force
+    }
+    if (Test-Path -Path 'C:\users\Public\Desktop\ImageRight Connect 7.0.106.1787.lnk') {
+        Remove-Item -Path 'C:\users\Public\Desktop\ImageRight Connect 7.0.106.1787.lnk' -Force
+    }
 }
 
 <#
@@ -440,10 +447,10 @@ function Install-BenefitPoint {
 #>
 function Install-Claros {
     param (
-        [string]$actuarialUrl = "https://eusthginfrastructure.blob.core.windows.net/thg-avd-deployment-scripts/AVD_Image_Deployments/Claros Install Software/ActuarialAssistantSetup_522_64.exe",
-        [string]$clarosUrl = "https://eusthginfrastructure.blob.core.windows.net/thg-avd-deployment-scripts/AVD_Image_Deployments/Claros Install Software/ClarosReserveSetup22_64.exe",
-        [string]$ExperienceUrl = "https://eusthginfrastructure.blob.core.windows.net/thg-avd-deployment-scripts/AVD_Image_Deployments/Claros Install Software/ExperienceMigrationSetup_522_64.exe",
-        [string]$RiskDecisionUrl = "https://eusthginfrastructure.blob.core.windows.net/thg-avd-deployment-scripts/AVD_Image_Deployments/Claros Install Software/RiskDecisionSupportSetup_522_64.exe"
+        [string]$actuarialUrl = 'https://eusthginfrastructure.blob.core.windows.net/thg-avd-deployment-scripts/AVD_Image_Deployments/Claros Install Software/ActuarialAssistantSetup_522_64.exe',
+        [string]$clarosUrl = 'https://eusthginfrastructure.blob.core.windows.net/thg-avd-deployment-scripts/AVD_Image_Deployments/Claros Install Software/ClarosReserveSetup22_64.exe',
+        [string]$ExperienceUrl = 'https://eusthginfrastructure.blob.core.windows.net/thg-avd-deployment-scripts/AVD_Image_Deployments/Claros Install Software/ExperienceMigrationSetup_522_64.exe',
+        [string]$RiskDecisionUrl = 'https://eusthginfrastructure.blob.core.windows.net/thg-avd-deployment-scripts/AVD_Image_Deployments/Claros Install Software/RiskDecisionSupportSetup_522_64.exe'
     )
 
     Invoke-DownloadAndStartProcess -DownloadURL $actuarialUrl -FileName 'ActuarialAssistantSetup_522_64.exe' -Arguments '/S /v/qn'
@@ -451,8 +458,8 @@ function Install-Claros {
     Invoke-DownloadAndStartProcess -DownloadURL $ExperienceUrl -FileName 'ExperienceMigrationSetup_522_64.exe' -Arguments '/S /v/qn'
     Invoke-DownloadAndStartProcess -DownloadURL $RiskDecisionUrl -FileName 'RiskDecisionSupportSetup_522_64.exe' -Arguments '/S /v/qn'
 
-    if (Test-Path "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Claros Analytics") {
-        Remove-Item "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Claros Analytics" -Force -Recurse -ErrorAction SilentlyContinue
+    if (Test-Path 'C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Claros Analytics') {
+        Remove-Item 'C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Claros Analytics' -Force -Recurse -ErrorAction SilentlyContinue
     }
 }
 
@@ -473,7 +480,7 @@ Downloads and installs the Cobra application from the specified URL.
 #>
 function Install-Cobra {
     param(
-        [string]$DownloadURL = "https://eusthginfrastructure.blob.core.windows.net/thg-avd-deployment-scripts/AVD_Image_Deployments/Cobra Install/CSISysFilesInstall.exe"
+        [string]$DownloadURL = 'https://eusthginfrastructure.blob.core.windows.net/thg-avd-deployment-scripts/AVD_Image_Deployments/Cobra Install/CSISysFilesInstall.exe'
     )
     Invoke-DownloadAndStartProcess -DownloadURL $DownloadURL -FileName 'CSISysFilesInstall.exe' -Arguments '/S /v/qn'
 }
@@ -494,7 +501,7 @@ function Install-Cobra {
 #>
 function Install-ProducerPlus {
     param(
-        [string]$DownloadURL = "https://eusthginfrastructure.blob.core.windows.net/thg-avd-deployment-scripts/AVD_Image_Deployments/ProducerPlus19.1/ProducerPlus.zip"
+        [string]$DownloadURL = 'https://eusthginfrastructure.blob.core.windows.net/thg-avd-deployment-scripts/AVD_Image_Deployments/ProducerPlus19.1/ProducerPlus.zip'
     )
 
     $TempFilePath = Get-TempFilePath -FileName 'ProducerPlus.zip'
@@ -503,11 +510,11 @@ function Install-ProducerPlus {
     Expand-Archive -Path $TempFilePath -DestinationPath $Path -Force
     Start-Process "$Path\ProducerPlus\ClientSetup.msi" -ArgumentList '/qn' -Wait
 
-    if (Test-Path "C:\Users\Public\Desktop\Producer Plus 19.1.lnk") {
-        Remove-Item "C:\Users\Public\Desktop\Producer Plus 19.1.lnk" -Force
+    if (Test-Path 'C:\Users\Public\Desktop\Producer Plus 19.1.lnk') {
+        Remove-Item 'C:\Users\Public\Desktop\Producer Plus 19.1.lnk' -Force
     }
-    if (Test-Path "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Producer Plus") {
-        Remove-Item "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Producer Plus" -Force -Recurse
+    if (Test-Path 'C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Producer Plus') {
+        Remove-Item 'C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Producer Plus' -Force -Recurse
     }
 }
 
@@ -528,7 +535,7 @@ function Install-ProducerPlus {
 #>
 function Install-PSQL {
     param(
-        [string]$DownloadURL = "https://eusthginfrastructure.blob.core.windows.net/thg-avd-deployment-scripts/AVD_Image_Deployments/PSQL client/PSQL.zip"
+        [string]$DownloadURL = 'https://eusthginfrastructure.blob.core.windows.net/thg-avd-deployment-scripts/AVD_Image_Deployments/PSQL client/PSQL.zip'
     )
 
     $TempFilePath = Get-TempFilePath -FileName 'PSQL.zip'
@@ -540,16 +547,16 @@ function Install-PSQL {
 
 function Install-Nasa {
     param(
-        [string]$DownloadURL = "https://eusthginfrastructure.blob.core.windows.net/thg-avd-deployment-scripts/AVD_Image_Deployments/nasa.exe"
+        [string]$DownloadURL = 'https://eusthginfrastructure.blob.core.windows.net/thg-avd-deployment-scripts/AVD_Image_Deployments/nasa.exe'
     )
 
     Invoke-DownloadAndStartProcess -DownloadURL $DownloadURL -FileName 'nasa.exe' -Arguments '/S /v/qn'
 
-    if (Test-Path "C:\Users\Public\Desktop\Eclipse 6.2.lnk") {
-        Remove-Item "C:\Users\Public\Desktop\Eclipse 6.2.lnk" -Force
+    if (Test-Path 'C:\Users\Public\Desktop\Eclipse 6.2.lnk') {
+        Remove-Item 'C:\Users\Public\Desktop\Eclipse 6.2.lnk' -Force
     }
-    if (Test-Path "C:\ProgramData\Microsoft\Windows\Start Menu\Eclipse 6.2") {
-        Remove-Item "C:\ProgramData\Microsoft\Windows\Start Menu\Eclipse 6.2" -Force -Recurse
+    if (Test-Path 'C:\ProgramData\Microsoft\Windows\Start Menu\Eclipse 6.2') {
+        Remove-Item 'C:\ProgramData\Microsoft\Windows\Start Menu\Eclipse 6.2' -Force -Recurse
     }
 }
 
@@ -598,6 +605,23 @@ function Repair-Winget {
     winget install Microsoft.WindowsAppRuntime.1.4
 }
 
+function Remove-QuickAssist {
+    $checkQuickAssist = Get-WindowsCapability -Online | Where-Object { $_.name -like '*QuickAssist*' }
+
+    if ($checkQuickAssist.state -eq 'Installed') {
+        try {
+            Remove-WindowsCapability -Online -Name $checkQuickAssist.name -ErrorAction Stop
+        }
+        catch {
+            $error[0].Exception.Message
+        }
+    }
+}
+
+function Remove-ClassicTeams {
+    Start-Process msiexec.exe -ArgumentList '/x {731F6BAA-A986-45A4-8936-7C3AAAAA760B} /qn' -Wait
+}
+
 
 Enable-WindowsOptionalFeature -Online -FeatureName 'NetFx3'
 
@@ -630,6 +654,10 @@ Install-ProducerPlus
 Install-PSQL
 
 Install-Nasa
+
+Remove-ClassicTeams
+
+Remove-QuickAssist
 
 Repair-Winget
 
