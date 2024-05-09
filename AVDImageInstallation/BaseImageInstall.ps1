@@ -622,43 +622,69 @@ function Remove-ClassicTeams {
     Start-Process msiexec.exe -ArgumentList '/x {731F6BAA-A986-45A4-8936-7C3AAAAA760B} /qn' -Wait
 }
 
+#Region Main Customization Program
 
 Enable-WindowsOptionalFeature -Online -FeatureName 'NetFx3'
 
+Write-Host "Installing Chocolatey"
 Install-Chocolatey
 
+
+Write-Host "Installing Chocolatey Packages"
 Install-ChocoPackages -Packages @('googlechrome', 'notepadplusplus', '7zip', 'vlc', 'powerbi')
 
+Write-Host "Installing Adobe Acrobat"
 Install-AdobeAcrobat
 
+Write-Host "Installing AMS360"
 Install-AMS360
 
+Write-Host "Istalling ImageRight"
 Install-ImageRight
 
+Write-Host "Installing LastPass"
 Install-LastPass
 
+Write-Host "Installing MSIX Cert"
 Install-MSIXCert
 
+Write-Host "Installing TransactNow"
 Install-TransactNow
 
+Write-Host "Installing Power Automate"
 Install-PowerAutomate
 
+Write-Host "Installing BenefitPoint"
 Install-BenefitPoint
 
+Write-Host "Installing Claros"
 Install-Claros
 
+Write-Host "Installing Cobra"
 Install-Cobra
 
+Write-Host "Installing Producer Plus"
 Install-ProducerPlus
 
+Write-Host "Installing PSQL"
 Install-PSQL
 
+Write-Host "Installing NASA"
 Install-Nasa
 
+Write-Host "Removing Classic Teams"
 Remove-ClassicTeams
 
+Write-Host "Removing Quick Assist"
 Remove-QuickAssist
 
-Repair-Winget
+#Write-Host "Repairing Winget"
+#Repair-Winget
 
-Set-Service wuauserv -StartupType Disabled -Force
+Write-Host "Disabling Windows Update Service"
+Set-Service wuauserv -StartupType Disabled
+
+Write-Host "Setting Time Zone to Eastern Standard Time"
+Set-TimeZone -Name 'Eastern Standard Time'
+
+#EndRegion
