@@ -366,7 +366,7 @@ Write-Host "Installing Chocolatey"
 Install-Chocolatey
 
 Write-Host "Installing Chocolatey Packages"
-Install-ChocoPackages -Packages @('googlechrome', 'notepadplusplus', '7zip', 'vlc', 'powerbi')
+Install-ChocoPackages -Packages @('googlechrome', 'notepadplusplus', '7zip', 'vlc')
 
 Write-Host "Installing Adobe Acrobat"
 Install-AdobeAcrobat
