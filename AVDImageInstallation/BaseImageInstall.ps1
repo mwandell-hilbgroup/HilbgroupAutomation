@@ -1,31 +1,5 @@
 <#
 .SYNOPSIS
-A script to install various software components including Adobe Acrobat, AMS360, .NET Framework 4.8, Microsoft Edge WebView2 Runtime, and WorkSmart.
-
-.DESCRIPTION
-This script contains functions to install various software components. Each function downloads the necessary files from the provided URLs and then installs the software. Some functions also check if the software is already installed and skip the installation if it is.
-
-The script contains the following functions:
-- Install-AdobeAcrobat: Installs Adobe Acrobat.
-- Install-AMS360: Installs AMS360.
-- Install-Net48: Installs .NET Framework 4.8.
-- Install-Web2View: Installs Microsoft Edge WebView2 Runtime.
-- Install-WorkSmart: Installs WorkSmart.
-
-.EXAMPLE
-To use the functions in the script, you can dot-source the script and then call the functions. For example:
-
-. .\script.ps1
-Install-AdobeAcrobat
-Install-AMS360
-Install-Net48
-Install-Web2View
-Install-WorkSmart
-
-This will install all the software components.
-
-<#
-.SYNOPSIS
 Generates a temporary file path for a given file name.
 
 .DESCRIPTION
@@ -84,174 +58,8 @@ function Invoke-DownloadAndStartProcess {
     $ProgressPreference = 'SilentlyContinue'
     $TempFilePath = Get-TempFilePath -FileName $FileName
     Invoke-WebRequest -Uri $DownloadURL -OutFile $TempFilePath
-    $ProgressPreference = 'Continue' 
+    $ProgressPreference = 'Continue'
     Start-Process $TempFilePath -ArgumentList $Arguments -Wait
-}
-
-<#
-.SYNOPSIS
-Installs Chocolatey on the system.
-
-.DESCRIPTION
-This function installs Chocolatey, a package manager for Windows. It does this by setting the execution policy to bypass for the current process, and then invoking the Chocolatey installation script from 'https://chocolatey.org/install.ps1'.
-
-.EXAMPLE
-Install-Chocolatey
-
-This will install Chocolatey on the system.
-
-.NOTES
-The function sets the execution policy to bypass for the current process. This means that the execution policy will be reset to its previous value when the current process exits.
-#>
-function Install-Chocolatey {
-    Set-ExecutionPolicy Bypass -Scope Process -Force
-    Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
-}
-
-<#
-.SYNOPSIS
-Installs a list of packages using Chocolatey.
-
-.DESCRIPTION
-This function takes an array of package names and installs each one using Chocolatey. It forces the installation and automatically confirms all prompts.
-
-.PARAMETER Packages
-An array of package names to install.
-
-.EXAMPLE
-Install-ChocoPackages -Packages @("git", "nodejs")
-
-This will install git and nodejs using Chocolatey.
-
-.NOTES
-Chocolatey must be installed on the system for this function to work.
-#>
-function Install-ChocoPackages {
-    param (
-        [string[]]$Packages
-    )
-
-    foreach ($package in $Packages) {
-        choco install $package -y -Force
-    }
-}
-
-<#
-.SYNOPSIS
-Installs Adobe Acrobat.
-
-.DESCRIPTION
-This function downloads Adobe Acrobat from the provided URL, extracts the downloaded file, downloads a transform file, and then installs Adobe Acrobat using the setup file and the transform file.
-
-.PARAMETER AdobeAcrobatWebURL
-The URL from which to download Adobe Acrobat.
-
-.PARAMETER AdobeTransformURL
-The URL from which to download the transform file.
-
-.EXAMPLE
-Install-AdobeAcrobat
-
-This will install Adobe Acrobat.
-
-.NOTES
-The function waits for the installation process to complete before returning.
-#>
-function Install-AdobeAcrobat {
-    param (
-        [string]$AdobeAcrobatWebURL = 'https://trials.adobe.com/AdobeProducts/APRO/Acrobat_HelpX/win32/Acrobat_DC_Web_x64_WWMUI.zip',
-        [string]$AdobeTransformURL = 'https://eusthginfrastructure.blob.core.windows.net/thg-avd-deployment-scripts/AVD_Image_Deployments/AcroPro.mst'
-    )
-    $TempFilePath = Get-TempFilePath -FileName 'AdobeAcrobatWebURL.zip'
-    $TempDirectory = (Split-Path -Path $TempFilePath -Parent)
-    $AcrobatPath = "$TempDirectory\Adobe Acrobat"
-
-    # Download the file
-    Invoke-WebRequest -Uri $AdobeAcrobatWebURL -OutFile $TempFilePath
-
-    # Extract the file
-    Expand-Archive -Path $TempFilePath -DestinationPath $TempDirectory -Force
-
-    # Download transformFile
-    Invoke-WebRequest -Uri $AdobeTransformURL -OutFile "$AcrobatPath\Transforms\AcroPro.mst"
-
-    # Install Adobe Acrobat
-    Start-Process -FilePath "$AcrobatPath\setup.exe" -ArgumentList '/sAll /rs /msi  EULA_ACCEPT=YES LANG_LIST=en_US UPDATE_MODE=0 DISABLE_ARM_SERVICE_INSTALL=1 ADD_THUMBNAILPREVIEW=YES' -Wait
-}
-
-<#
-.SYNOPSIS
-Installs LastPass using the specified LastPass installer URL.
-
-.DESCRIPTION
-The Install-LastPass function downloads and installs LastPass on the local machine using the LastPass installer URL provided as a parameter. By default, it uses the LastPassURL "https://download.cloud.lastpass.com/windows_installer/LastPassInstaller.msi".
-
-.PARAMETER LastPassURL
-Specifies the URL of the LastPass installer. If not provided, the default URL will be used.
-
-.EXAMPLE
-Install-LastPass -LastPassURL "https://example.com/lastpassinstaller.msi"
-Downloads and installs LastPass using the specified LastPass installer URL.
-#>
-function Install-LastPass {
-    param (
-        [string]$LastPassURL = 'https://download.cloud.lastpass.com/windows_installer/LastPassInstaller.msi'
-    )
-    Invoke-DownloadAndStartProcess -DownloadURL $LastPassURL -FileName 'LastPassInstaller.msi' -Arguments 'ALLUSERS=1 ADDLOCAL=ExplorerExtension,ChromeExtension,FirefoxExtension,EdgeExtension NODISABLEIEPWMGR=1 NODISABLECHROMEPWMGR=1 /qn'
-}
-
-<#
-.SYNOPSIS
-Installs TransactNOW application.
-
-.DESCRIPTION
-This function installs the TransactNOW application by downloading the setup file from the specified URL and starting the installation process.
-
-.PARAMETER TransactNowURL
-The URL of the TransactNOW setup file. The default value is "https://eusthginfrastructure.blob.core.windows.net/thg-avd-deployment-scripts/AVD_Image_Deployments/TransactNOW Setup.exe".
-
-.EXAMPLE
-Install-TransactNow -TransactNowURL "https://example.com/TransactNOW_Setup.exe"
-Downloads the TransactNOW setup file from the specified URL and starts the installation process.
-
-#>
-function Install-TransactNow {
-    param (
-        [string]$TransactNowURL = 'https://eusthginfrastructure.blob.core.windows.net/thg-avd-deployment-scripts/AVD_Image_Deployments/TransactNOW Setup.exe'
-    )
-    Invoke-DownloadAndStartProcess -DownloadURL $TransactNowURL -FileName 'TransactNowSetup.exe' -Arguments '-q'    
-}
-
-<#
-.SYNOPSIS
-Installs AMS360.
-
-.DESCRIPTION
-This function downloads AMS360 from the provided URL and then installs it.
-
-.PARAMETER AMS360WebURL
-The URL from which to download AMS360.
-
-.EXAMPLE
-Install-AMS360
-
-This will install AMS360.
-
-.NOTES
-The function uses the Invoke-DownloadAndStartProcess function to download and install AMS360.
-#>
-function Install-AMS360 {
-    param (
-        [string]$AMS360WebURL = 'https://eusthginfrastructure.blob.core.windows.net/thg-remediation-scripts/AMS360ClientInstallerRev11.msi'
-    )
-    Invoke-DownloadAndStartProcess -DownloadURL $AMS360WebURL -FileName 'AMS360ClientInstallerRev11.msi' -Arguments '/qn'
-
-    if (Test-Path -Path 'C:\users\Public\Desktop\Install TransactNow.url') {
-        Remove-Item -Path 'C:\users\Public\Desktop\Install TransactNow.url' -Force
-    }
-    if (Test-Path -Path 'C:\users\Public\Desktop\ImageRight Connect 7.0.106.1787.lnk') {
-        Remove-Item -Path 'C:\users\Public\Desktop\ImageRight Connect 7.0.106.1787.lnk' -Force
-    }
 }
 
 <#
@@ -309,6 +117,129 @@ function Install-Web2View {
         return
     }
     Invoke-DownloadAndStartProcess -DownloadURL $DownloadURL -FileName 'MicrosoftEdgeWebView2RuntimeInstallerX86.exe' -Arguments '/silent /install'
+}
+
+<#
+.SYNOPSIS
+Installs Chocolatey on the system.
+
+.DESCRIPTION
+This function installs Chocolatey, a package manager for Windows. It does this by setting the execution policy to bypass for the current process, and then invoking the Chocolatey installation script from 'https://chocolatey.org/install.ps1'.
+
+.EXAMPLE
+Install-Chocolatey
+
+This will install Chocolatey on the system.
+
+.NOTES
+The function sets the execution policy to bypass for the current process. This means that the execution policy will be reset to its previous value when the current process exits.
+#>
+function Install-Chocolatey {
+    Set-ExecutionPolicy Bypass -Scope Process -Force
+    Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
+}
+
+<#
+.SYNOPSIS
+Installs a list of packages using Chocolatey.
+
+.DESCRIPTION
+This function takes an array of package names and installs each one using Chocolatey. It forces the installation and automatically confirms all prompts.
+
+.PARAMETER Packages
+An array of package names to install.
+
+.EXAMPLE
+Install-ChocoPackages -Packages @("git", "nodejs")
+
+This will install git and nodejs using Chocolatey.
+
+.NOTES
+Chocolatey must be installed on the system for this function to work.
+#>
+function Install-ChocoPackages {
+    param (
+        [string[]]$Packages
+    )
+
+    foreach ($package in $Packages) {
+        choco install $package -y -Force --ignore-checksums
+    }
+}
+
+<#
+.SYNOPSIS
+Installs Adobe Acrobat.
+
+.DESCRIPTION
+This function downloads Adobe Acrobat from the provided URL, extracts the downloaded file, downloads a transform file, and then installs Adobe Acrobat using the setup file and the transform file.
+
+.PARAMETER AdobeAcrobatWebURL
+The URL from which to download Adobe Acrobat.
+
+.PARAMETER AdobeTransformURL
+The URL from which to download the transform file.
+
+.EXAMPLE
+Install-AdobeAcrobat
+
+This will install Adobe Acrobat.
+
+.NOTES
+The function waits for the installation process to complete before returning.
+#>
+function Install-AdobeAcrobat {
+    param (
+        [string]$AdobeAcrobatWebURL = 'https://trials.adobe.com/AdobeProducts/APRO/Acrobat_HelpX/win32/Acrobat_DC_Web_x64_WWMUI.zip',
+        [string]$AdobeTransformURL = 'https://eusthginfrastructure.blob.core.windows.net/thg-avd-deployment-scripts/AVD_Image_Deployments/AcroPro.mst'
+    )
+    $TempFilePath = Get-TempFilePath -FileName 'AdobeAcrobatWebURL.zip'
+    $TempDirectory = (Split-Path -Path $TempFilePath -Parent)
+    $AcrobatPath = "$TempDirectory\Adobe Acrobat"
+
+    # Download the file
+    Invoke-WebRequest -Uri $AdobeAcrobatWebURL -OutFile $TempFilePath
+
+    # Extract the file
+    Expand-Archive -Path $TempFilePath -DestinationPath $TempDirectory -Force
+
+    # Download transformFile
+    Invoke-WebRequest -Uri $AdobeTransformURL -OutFile "$AcrobatPath\Transforms\AcroPro.mst"
+
+    # Install Adobe Acrobat
+    Start-Process -FilePath "$AcrobatPath\setup.exe" -ArgumentList '/sAll /rs /msi  EULA_ACCEPT=YES LANG_LIST=en_US UPDATE_MODE=0 DISABLE_ARM_SERVICE_INSTALL=1 ADD_THUMBNAILPREVIEW=YES' -Wait
+}
+
+<#
+.SYNOPSIS
+Installs AMS360.
+
+.DESCRIPTION
+This function downloads AMS360 from the provided URL and then installs it.
+
+.PARAMETER AMS360WebURL
+The URL from which to download AMS360.
+
+.EXAMPLE
+Install-AMS360
+
+This will install AMS360.
+
+.NOTES
+The function uses the Invoke-DownloadAndStartProcess function to download and install AMS360.
+#>
+function Install-AMS360 {
+    param (
+        [string]$AMS360WebURL = 'https://eusthginfrastructure.blob.core.windows.net/thg-software-deploy/AMS360ClientInstaller-Rev12.msi%22'
+    )
+    Invoke-DownloadAndStartProcess -DownloadURL $AMS360WebURL -FileName 'AMS360ClientInstallerRev11.msi' -Arguments '/qn'
+
+    if (Test-Path -Path 'C:\users\Public\Desktop\Install TransactNow.url') {
+        Remove-Item -Path 'C:\users\Public\Desktop\Install TransactNow.url' -Force
+    }
+    if (Test-Path -Path 'C:\users\Public\Desktop\ImageRight Connect 7.0.106.1787.lnk') {
+        Remove-Item -Path 'C:\users\Public\Desktop\ImageRight Connect 7.0.106.1787.lnk' -Force
+    }
 }
 
 <#
@@ -395,215 +326,6 @@ function Install-ImageRight {
     Install-WorkSmart
 }
 
-function Install-MSIXCert {
-    param (
-        [string]$DownloadURL = 'https://eusthginfrastructure.blob.core.windows.net/thg-avd-deployment-scripts/AVD_Image_Deployments/MSIXSigningCert.pfx'
-    )
-    $TempFilePath = Get-TempFilePath -FileName 'MSIXSigningCert.pfx'
-    Invoke-WebRequest -Uri $DownloadURL -OutFile $TempFilePath
-    $password = ConvertTo-SecureString -String 'ZqQEbP7dR6BpDL9oIrZKlqZsAV' -AsPlainText -Force
-    Import-PfxCertificate -Password $password -FilePath $TempFilePath -CertStoreLocation Cert:\LocalMachine\Root
-}
-
-function Install-PowerAutomate {
-    param (
-        [string]$DownloadURL = 'https://go.microsoft.com/fwlink/?linkid=2102613'
-    )
-
-    Invoke-DownloadAndStartProcess -DownloadURL $DownloadURL -FileName 'PowerAutomate.exe' -Arguments '-Install -AcceptEULA -Silent'
-}
-
-function Install-BenefitPoint {
-    param (
-        [string]$DownloadURL = 'https://eusthginfrastructure.blob.core.windows.net/thg-avd-deployment-scripts/AVD_Image_Deployments/EStatement/eStatement 4.0.0.31.msi'
-    )
-
-    Invoke-DownloadAndStartProcess -DownloadURL $DownloadURL -FileName 'eStatement.msi' -Arguments '/qn'
-}
-
-<#
-.SYNOPSIS
-    Installs Claros software components.
-
-.DESCRIPTION
-    This function installs the Claros software components by downloading and running the required setup files.
-
-.PARAMETER actuarialUrl
-    The URL of the Actuarial Assistant setup file.
-
-.PARAMETER clarosUrl
-    The URL of the Claros Reserve setup file.
-
-.PARAMETER ExperienceUrl
-    The URL of the Experience Migration setup file.
-
-.PARAMETER RiskDecisionUrl
-    The URL of the Risk Decision Support setup file.
-
-.EXAMPLE
-    Install-Claros -actuarialUrl "https://example.com/ActuarialAssistantSetup.exe" -clarosUrl "https://example.com/ClarosReserveSetup.exe" -ExperienceUrl "https://example.com/ExperienceMigrationSetup.exe" -RiskDecisionUrl "https://example.com/RiskDecisionSupportSetup.exe"
-    Installs the Claros software components using the specified URLs.
-
-#>
-function Install-Claros {
-    param (
-        [string]$actuarialUrl = 'https://eusthginfrastructure.blob.core.windows.net/thg-avd-deployment-scripts/AVD_Image_Deployments/Claros Install Software/ActuarialAssistantSetup_522_64.exe',
-        [string]$clarosUrl = 'https://eusthginfrastructure.blob.core.windows.net/thg-avd-deployment-scripts/AVD_Image_Deployments/Claros Install Software/ClarosReserveSetup22_64.exe',
-        [string]$ExperienceUrl = 'https://eusthginfrastructure.blob.core.windows.net/thg-avd-deployment-scripts/AVD_Image_Deployments/Claros Install Software/ExperienceMigrationSetup_522_64.exe',
-        [string]$RiskDecisionUrl = 'https://eusthginfrastructure.blob.core.windows.net/thg-avd-deployment-scripts/AVD_Image_Deployments/Claros Install Software/RiskDecisionSupportSetup_522_64.exe'
-    )
-
-    Invoke-DownloadAndStartProcess -DownloadURL $actuarialUrl -FileName 'ActuarialAssistantSetup_522_64.exe' -Arguments '/S /v/qn'
-    Invoke-DownloadAndStartProcess -DownloadURL $clarosUrl -FileName 'ClarosReserveSetup22_64.exe' -Arguments '/S /v/qn'
-    Invoke-DownloadAndStartProcess -DownloadURL $ExperienceUrl -FileName 'ExperienceMigrationSetup_522_64.exe' -Arguments '/S /v/qn'
-    Invoke-DownloadAndStartProcess -DownloadURL $RiskDecisionUrl -FileName 'RiskDecisionSupportSetup_522_64.exe' -Arguments '/S /v/qn'
-
-    if (Test-Path 'C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Claros Analytics') {
-        Remove-Item 'C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Claros Analytics' -Force -Recurse -ErrorAction SilentlyContinue
-    }
-}
-
-<#
-.SYNOPSIS
-Installs the Cobra application.
-
-.DESCRIPTION
-The Install-Cobra function downloads and installs the Cobra application from the specified URL.
-
-.PARAMETER DownloadURL
-The URL from which to download the Cobra installation file. The default value is "https://eusthginfrastructure.blob.core.windows.net/thg-avd-deployment-scripts/AVD_Image_Deployments/Cobra Install/CSISysFilesInstall.exe".
-
-.EXAMPLE
-Install-Cobra -DownloadURL "https://example.com/cobra_installer.exe"
-Downloads and installs the Cobra application from the specified URL.
-
-#>
-function Install-Cobra {
-    param(
-        [string]$DownloadURL = 'https://eusthginfrastructure.blob.core.windows.net/thg-avd-deployment-scripts/AVD_Image_Deployments/Cobra Install/CSISysFilesInstall.exe'
-    )
-    Invoke-DownloadAndStartProcess -DownloadURL $DownloadURL -FileName 'CSISysFilesInstall.exe' -Arguments '/S /v/qn'
-}
-
-<#
-.SYNOPSIS
-    Installs the Producer Plus application.
-
-.DESCRIPTION
-    The Install-ProducerPlus function downloads the Producer Plus application from a specified URL, extracts the contents, and installs it silently on the local machine. It also removes any existing shortcuts or start menu entries for the application.
-
-.PARAMETER DownloadURL
-    Specifies the URL from which to download the Producer Plus application. The default value is "https://eusthginfrastructure.blob.core.windows.net/thg-avd-deployment-scripts/AVD_Image_Deployments/ProducerPlus19.1/ProducerPlus.zip".
-
-.EXAMPLE
-    Install-ProducerPlus -DownloadURL "https://example.com/ProducerPlus.zip"
-    Downloads the Producer Plus application from the specified URL and installs it.
-#>
-function Install-ProducerPlus {
-    param(
-        [string]$DownloadURL = 'https://eusthginfrastructure.blob.core.windows.net/thg-avd-deployment-scripts/AVD_Image_Deployments/ProducerPlus19.1/ProducerPlus.zip'
-    )
-
-    $TempFilePath = Get-TempFilePath -FileName 'ProducerPlus.zip'
-    Invoke-WebRequest -Uri $DownloadURL -OutFile $TempFilePath
-    $Path = Split-Path $TempFilePath
-    Expand-Archive -Path $TempFilePath -DestinationPath $Path -Force
-    Start-Process "$Path\ProducerPlus\ClientSetup.msi" -ArgumentList '/qn' -Wait
-
-    if (Test-Path 'C:\Users\Public\Desktop\Producer Plus 19.1.lnk') {
-        Remove-Item 'C:\Users\Public\Desktop\Producer Plus 19.1.lnk' -Force
-    }
-    if (Test-Path 'C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Producer Plus') {
-        Remove-Item 'C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Producer Plus' -Force -Recurse
-    }
-}
-
-<#
-.SYNOPSIS
-    Installs PSQL client.
-
-.DESCRIPTION
-    This function downloads and installs the PSQL client from the specified URL.
-
-.PARAMETER DownloadURL
-    The URL from which to download the PSQL client. Default value is "https://eusthginfrastructure.blob.core.windows.net/thg-avd-deployment-scripts/AVD_Image_Deployments/PSQL client/PSQL.zip".
-
-.EXAMPLE
-    Install-PSQL -DownloadURL "https://example.com/PSQL.zip"
-    Downloads and installs the PSQL client from the specified URL.
-
-#>
-function Install-PSQL {
-    param(
-        [string]$DownloadURL = 'https://eusthginfrastructure.blob.core.windows.net/thg-avd-deployment-scripts/AVD_Image_Deployments/PSQL client/PSQL.zip'
-    )
-
-    $TempFilePath = Get-TempFilePath -FileName 'PSQL.zip'
-    Invoke-WebRequest -Uri $DownloadURL -OutFile $TempFilePath
-    $Path = Split-Path $TempFilePath
-    Expand-Archive -Path $TempFilePath -DestinationPath $Path -Force
-    Start-Process "$Path\PSQL\ActianCache\PSQL13.20\PSQL - Windows\Data\SetupClient64_x64.exe" -ArgumentList '/s /w /v/qn' -Wait
-}
-
-function Install-Nasa {
-    param(
-        [string]$DownloadURL = 'https://eusthginfrastructure.blob.core.windows.net/thg-avd-deployment-scripts/AVD_Image_Deployments/nasa.exe'
-    )
-
-    Invoke-DownloadAndStartProcess -DownloadURL $DownloadURL -FileName 'nasa.exe' -Arguments '/S /v/qn'
-
-    if (Test-Path 'C:\Users\Public\Desktop\Eclipse 6.2.lnk') {
-        Remove-Item 'C:\Users\Public\Desktop\Eclipse 6.2.lnk' -Force
-    }
-    if (Test-Path 'C:\ProgramData\Microsoft\Windows\Start Menu\Eclipse 6.2') {
-        Remove-Item 'C:\ProgramData\Microsoft\Windows\Start Menu\Eclipse 6.2' -Force -Recurse
-    }
-}
-
-function Repair-Winget {
-    ##*===============================================
-    ##* Find Latest Version of Winget
-    ##*===============================================
-    function getNewestLink($match) {
-        $uri = 'https://api.github.com/repos/microsoft/winget-cli/releases/latest'
-        Write-Verbose "[$((Get-Date).TimeofDay)] Getting information from $uri"
-        $get = Invoke-RestMethod -Uri $uri -Method Get -UseBasicParsing -ErrorAction stop
-        Write-Verbose "[$((Get-Date).TimeofDay)] getting latest release"
-        $data = $get[0].assets | Where-Object name -Match $match
-        return $data.browser_download_url
-    }
-    
-    $wingetUrl = getNewestLink('msixbundle')
-    $wingetLicenseUrl = getNewestLink('License1.xml')
-    
-    ##*===============================================
-    ##* Install Winget
-    ##*===============================================
-    Write-Host 'Installing Winget'
-    $wingetPath = 'winget.msixbundle'
-    $wc = New-Object net.webclient
-    $wc.Downloadfile($wingetUrl, $wingetPath)
-
-    $wingetLicensePath = 'license1.xml'
-    $wc = New-Object net.webclient
-    $wc.Downloadfile($wingetLicenseUrl, $wingetLicensePath)
-
-    Add-AppxProvisionedPackage -Online -PackagePath $wingetPath -LicensePath $wingetLicensePath -ErrorAction SilentlyContinue
-    $path = [Environment]::GetEnvironmentVariable('PATH', 'User')
-    $path = $path + ';' + [IO.Path]::Combine([Environment]::GetEnvironmentVariable('LOCALAPPDATA'), 'Microsoft', 'WindowsApps')
-    [Environment]::SetEnvironmentVariable('PATH', $path, 'User')
-    Remove-Item $wingetPath
-    Remove-Item $wingetLicensePath
-
-    Invoke-WebRequest -Uri https://aka.ms/getwinget -OutFile Microsoft.DesktopAppInstaller_8wekyb3d8bbwe.msixbundle
-    Invoke-WebRequest -Uri https://aka.ms/Microsoft.VCLibs.x64.14.00.Desktop.appx -OutFile Microsoft.VCLibs.x64.14.00.Desktop.appx
-    Invoke-WebRequest -Uri https://github.com/microsoft/microsoft-ui-xaml/releases/download/v2.8.6/Microsoft.UI.Xaml.2.8.x64.appx -OutFile Microsoft.UI.Xaml.2.8.x64.appx
-    Add-AppxPackage Microsoft.VCLibs.x64.14.00.Desktop.appx
-    Add-AppxPackage Microsoft.UI.Xaml.2.8.x64.appx
-    Add-AppxPackage Microsoft.DesktopAppInstaller_8wekyb3d8bbwe.msixbundle
-
-    winget install Microsoft.WindowsAppRuntime.1.4
-}
 
 function Remove-QuickAssist {
     $checkQuickAssist = Get-WindowsCapability -Online | Where-Object { $_.name -like '*QuickAssist*' }
@@ -611,24 +333,37 @@ function Remove-QuickAssist {
     if ($checkQuickAssist.state -eq 'Installed') {
         try {
             Remove-WindowsCapability -Online -Name $checkQuickAssist.name -ErrorAction Stop
-        }
-        catch {
+        } catch {
             $error[0].Exception.Message
         }
     }
 }
 
-function Remove-ClassicTeams {
-    Start-Process msiexec.exe -ArgumentList '/x {731F6BAA-A986-45A4-8936-7C3AAAAA760B} /qn' -Wait
-}
+function Disable-OOBESteps {
+    $registryPaths = @{
+        "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\OOBE"            = @{
+            "DisablePrivacyExperience" = 1
+            "DisableVoice"             = 1
+            "PrivacyConsentStatus"     = 1
+            "Protectyourpc"            = 3
+            "HideEULAPage"             = 1
+        }
+        "HKLM:\Software\Microsoft\Windows\CurrentVersion\Policies\System" = @{
+            "EnableFirstLogonAnimation" = 1
+        }
+    }
 
-#Region Main Customization Program
+    foreach ($path in $registryPaths.Keys) {
+        foreach ($name in $registryPaths[$path].Keys) {
+            New-ItemProperty -Path $path -Name $name -Value $registryPaths[$path][$name] -PropertyType DWord -Force
+        }
+    }
+}
 
 Enable-WindowsOptionalFeature -Online -FeatureName 'NetFx3'
 
 Write-Host "Installing Chocolatey"
 Install-Chocolatey
-
 
 Write-Host "Installing Chocolatey Packages"
 Install-ChocoPackages -Packages @('googlechrome', 'notepadplusplus', '7zip', 'vlc', 'powerbi')
@@ -639,52 +374,14 @@ Install-AdobeAcrobat
 Write-Host "Installing AMS360"
 Install-AMS360
 
-Write-Host "Istalling ImageRight"
+Write-Host "Installing ImageRight"
 Install-ImageRight
-
-Write-Host "Installing LastPass"
-Install-LastPass
-
-Write-Host "Installing MSIX Cert"
-Install-MSIXCert
-
-Write-Host "Installing TransactNow"
-Install-TransactNow
-
-Write-Host "Installing Power Automate"
-Install-PowerAutomate
-
-Write-Host "Installing BenefitPoint"
-Install-BenefitPoint
-
-Write-Host "Installing Claros"
-Install-Claros
-
-Write-Host "Installing Cobra"
-Install-Cobra
-
-Write-Host "Installing Producer Plus"
-Install-ProducerPlus
-
-Write-Host "Installing PSQL"
-Install-PSQL
-
-Write-Host "Installing NASA"
-Install-Nasa
-
-Write-Host "Removing Classic Teams"
-Remove-ClassicTeams
 
 Write-Host "Removing Quick Assist"
 Remove-QuickAssist
 
-#Write-Host "Repairing Winget"
-#Repair-Winget
-
-Write-Host "Disabling Windows Update Service"
-Set-Service wuauserv -StartupType Disabled
-
 Write-Host "Setting Time Zone to Eastern Standard Time"
 Set-TimeZone -Name 'Eastern Standard Time'
 
-#EndRegion
+Write-Host "Disabling OOBE"
+Disable-OOBESteps
