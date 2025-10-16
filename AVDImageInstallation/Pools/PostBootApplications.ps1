@@ -37,6 +37,26 @@ function Install-NetSkope {
     Invoke-DownloadAndStartProcess -DownloadURL $DownloadURL -FileName 'NSClient.msi' -Arguments $arguments
 }
 
+function Install-SentinelOne {
+
+    $S1URL64 = "https://eusthginfrastructure.blob.core.windows.net/thg-software-deploy/S1.msi"
+    $S1File64 = "S1.msi"
+    $Arguments = '/q /norestart SITE_TOKEN="eyJ1cmwiOiAiaHR0cHM6Ly91c2VhMS1jc3MtczEwMS5zZW50aW5lbG9uZS5uZXQiLCAic2l0ZV9rZXkiOiAiYTljNDJjYzYxNDUzM2NkNyJ9"'
+
+    Invoke-DownloadAndStartProcess -DownloadURL $S1URL64 -FileName $S1File64 -Arguments $Arguments
+}
+
+function Install-WorkdayOfficeConnect {
+    $url = "https://clickonce.adaptiveinsights.com/officeconnect/latest/OfficeConnectMachineSetup.exe"
+
+    Invoke-DownloadAndStartProcess -DownloadURL $url -FileName "OfficeConnectMachineSetup.exe" -Arguments "/quiet"
+}
+
+
 Install-Qualys
 
 Install-NetSkope
+
+Install-SentinelOne
+
+Install-WorkdayOfficeConnect

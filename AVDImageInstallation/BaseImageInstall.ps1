@@ -230,9 +230,9 @@ The function uses the Invoke-DownloadAndStartProcess function to download and in
 #>
 function Install-AMS360 {
     param (
-        [string]$AMS360WebURL = 'https://eusthginfrastructure.blob.core.windows.net/thg-software-deploy/AMS360ClientInstaller-Rev12.msi%22'
+        [string]$AMS360WebURL = 'https://eusthginfrastructure.blob.core.windows.net/thg-software-deploy/AMS360ClientInstaller-Rev12.msi'
     )
-    Invoke-DownloadAndStartProcess -DownloadURL $AMS360WebURL -FileName 'AMS360ClientInstallerRev11.msi' -Arguments '/qn'
+    Invoke-DownloadAndStartProcess -DownloadURL $AMS360WebURL -FileName 'AMS360ClientInstallerRev12.msi' -Arguments '/qn'
 
     if (Test-Path -Path 'C:\users\Public\Desktop\Install TransactNow.url') {
         Remove-Item -Path 'C:\users\Public\Desktop\Install TransactNow.url' -Force
@@ -324,12 +324,10 @@ function Install-ImageRight {
     Install-Net48
     Install-Web2View
     Install-WorkSmart
-}
 
-function Install-WorkdayOfficeConnect {
-    $url = "https://clickonce.adaptiveinsights.com/officeconnect/latest/OfficeConnectMachineSetup.exe"
+    $PrinterUrl = "https://eusthginfrastructure.blob.core.windows.net/thg-software-deploy/ImageRight.PDFPrinter.64.msi"
 
-    Invoke-DownloadAndStartProcess -DownloadURL $url -FileName "OfficeConnectMachineSetup.exe" -Arguments "/quiet"
+    Invoke-DownloadAndStartProcess -DownloadURL $PrinterUrl -FileName "mageRight.PDFPrinter.64.msi" -Arguments '/qn'
 }
 
 
@@ -382,9 +380,6 @@ Install-AMS360
 
 Write-Host "Installing ImageRight"
 Install-ImageRight
-
-Write-Host "Install Workday Office Connect"
-Install-WorkdayOfficeConnect
 
 Write-Host "Removing Quick Assist"
 Remove-QuickAssist

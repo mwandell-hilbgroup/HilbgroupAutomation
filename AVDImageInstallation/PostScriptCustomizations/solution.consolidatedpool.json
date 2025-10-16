@@ -1,0 +1,48 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "resources": [
+    {
+      "type": "Microsoft.Compute/virtualMachines/extensions",
+      "apiVersion": "2020-12-01",
+      "name": "[concat(variables('vmName'),'/', 'PostBootScript')]",
+      "location": "eastus",
+      "dependsOn": [
+        "[concat('Microsoft.Compute/virtualMachines/',variables('vmName'))]"
+      ],
+      "properties": {
+        "publisher": "Microsoft.Compute",
+        "type": "CustomScriptExtension",
+        "typeHandlerVersion": "1.7",
+        "autoUpgradeMinorVersion": true,
+        "settings": {
+          "fileUris": [
+            "https://raw.githubusercontent.com/mwandell-hilbgroup/HilbgroupAutomation/refs/heads/main/AVDImageInstallation/Pools/PostBootApplications.ps1"
+          ],
+          "commandToExecute": "powershell.exe -ExecutionPolicy Unrestricted -File PostBootApplications.ps1"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Compute/virtualMachines/extensions",
+      "apiVersion": "2020-12-01",
+      "name": "[concat(variables('vmName'),'/', 'ConsolidatedPool')]",
+      "location": "eastus",
+      "dependsOn": [
+        "[concat('Microsoft.Compute/virtualMachines/',variables('vmName'))]"
+      ],
+      "properties": {
+        "publisher": "Microsoft.Compute",
+        "type": "CustomScriptExtension",
+        "typeHandlerVersion": "1.7",
+        "autoUpgradeMinorVersion": true,
+        "settings": {
+          "fileUris": [
+            "https://raw.githubusercontent.com/mwandell-hilbgroup/HilbgroupAutomation/refs/heads/main/AVDImageInstallation/Pools/Consolidated-Pool.ps1"
+          ],
+          "commandToExecute": "powershell.exe -ExecutionPolicy Unrestricted -File Consolidated-Pool.ps1"
+        }
+      }
+    }
+  ]
+}
