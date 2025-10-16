@@ -326,6 +326,12 @@ function Install-ImageRight {
     Install-WorkSmart
 }
 
+function Install-WorkdayOfficeConnect {
+    $url = "https://clickonce.adaptiveinsights.com/officeconnect/latest/OfficeConnectMachineSetup.exe"
+
+    Invoke-DownloadAndStartProcess -DownloadURL $url -FileName "OfficeConnectMachineSetup.exe" -Arguments "/quiet"
+}
+
 
 function Remove-QuickAssist {
     $checkQuickAssist = Get-WindowsCapability -Online | Where-Object { $_.name -like '*QuickAssist*' }
@@ -376,6 +382,9 @@ Install-AMS360
 
 Write-Host "Installing ImageRight"
 Install-ImageRight
+
+Write-Host "Install Workday Office Connect"
+Install-WorkdayOfficeConnect
 
 Write-Host "Removing Quick Assist"
 Remove-QuickAssist
