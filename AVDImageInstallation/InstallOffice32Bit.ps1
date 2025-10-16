@@ -2,7 +2,7 @@ $TempDirectory = [System.IO.Path]::GetTempPath()
 $OfficeInstallDownloadPath = $TempDirectory + 'OfficeInstall'
 $ConfigPath = "$OfficeInstallDownloadPath\configuration.xml"
 
-$configXML = @"
+$configxml = @"
 <Configuration ID="e457c3aa-e366-4a32-bc8c-c065bc4e1f1a">
 <Add OfficeClientEdition="32" Channel="Current">
   <Product ID="O365ProPlusRetail">
@@ -41,6 +41,12 @@ if (-Not(Test-Path $OfficeInstallDownloadPath )) {
   New-Item -Path $OfficeInstallDownloadPath -ItemType Directory | Out-Null
 }
 
+if (-Not(Test-Path $ConfigPath)) {
+  New-Item -Path $ConfigPath -ItemType File | Out-Null
+}
+
+$configXML | Set-Content -Path $ConfigPath
+
 $ODTInstallLink = "https://download.microsoft.com/download/6c1eeb25-cf8b-41d9-8d0d-cc1dbc032140/officedeploymenttool_19231-20156.exe"
 
 Write-Verbose 'Downloading the Office Deployment Tool...'
@@ -61,8 +67,6 @@ try {
   Write-Warning 'Error running the Office Deployment Tool. The error is below:'
   Write-Warning $_
 }
-
-$configXML | Out-File $ConfigPath
 
 #Run the O365 install
 try {

@@ -27,7 +27,7 @@ function Install-Qualys {
     $Arguments = "CustomerID={" + $CustomerID + "} ActivationId={" + $ActivationID + "} WebServiceUri=" + $WebURI
     $DownloadURL = "https://eusthginfrastructure.blob.core.windows.net/thg-software-deploy/CloudAgent_x64.msi"
 
-    Invoke-DownloadAndStartProcess -DownloadURL $DownloadURL -Arguments $Arguments
+    Invoke-DownloadAndStartProcess -DownloadURL $DownloadURL -FileName "CloudAgent_x64.msi" -Arguments $Arguments
 }
 
 function Install-NetSkope {

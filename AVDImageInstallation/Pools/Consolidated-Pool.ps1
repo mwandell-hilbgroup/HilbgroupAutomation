@@ -314,7 +314,6 @@ function Install-Nasa {
     }
 }
 
-
 function Install-Qualys {
     $ActivationID = "fa0969cf-7264-45bf-be34-52632dcca96f"
     $CustomerID = "0fc184d4-664e-73f8-82c6-ef818818f7ca"
@@ -322,7 +321,7 @@ function Install-Qualys {
     $Arguments = "CustomerID={" + $CustomerID + "} ActivationId={" + $ActivationID + "} WebServiceUri=" + $WebURI
     $DownloadURL = "https://eusthginfrastructure.blob.core.windows.net/thg-software-deploy/CloudAgent_x64.msi"
 
-    Invoke-DownloadAndStartProcess -DownloadURL $DownloadURL -Arguments $Arguments
+    Invoke-DownloadAndStartProcess -DownloadURL $DownloadURL -FileName "CloudAgent_x64.msi" -Arguments $Arguments
 }
 
 function Install-NetSkope {
@@ -376,11 +375,3 @@ Install-PSQL
 
 Write-Host "Installing NASA"
 Install-Nasa
-
-Install-Qualys
-
-Install-NetSkope
-
-Install-SentinelOne
-
-Install-WorkdayOfficeConnect
